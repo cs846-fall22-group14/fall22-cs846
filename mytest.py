@@ -180,9 +180,11 @@ class AnalyzeContext:
 #     "94600").analyzePatterns()
 
 
-def analyze_gcc():
-    g = os.walk("/Users/ymy/CS846/sourcecode/gcc/gcc/testsuite")
-    pat = re.compile(r"pr(\d+).*\.c[c|pp]?$", re.I)
+def analyze_codes(path: str):
+    # g = os.walk("/Users/ymy/CS846/sourcecode/gcc/gcc/testsuite")
+    g = os.walk(path)
+    # pat = re.compile(r"pr(\d+).*\.c[c|pp]?$", re.I)
+    pat = re.compile(r"\.(?:c[c|pp]?|h)$", re.I)
     result_list = []
 
     for path, dir_list, file_list in g:
@@ -191,13 +193,11 @@ def analyze_gcc():
             if match:
                 print("Analyzing " + path + "/" + file_name)
                 ctx = AnalyzeContext(path + "/" + file_name,
-                                     file_name, match.groups()[0])
+                                     file_name, "")
                 ctx.analyzePatterns()
                 result_list.append(ctx)
-    with open('stat.csv', 'w', newline='') as csvfile:
-        writer = csv.writer(csvfile, delimiter=',')
-        for result in result_list:
-            writer.writerow(list(result))
+    save_path = 'stat public repos.csv'
+    saveResults(result_list, save_path)
 
 
 def analyze_generated():
@@ -227,10 +227,15 @@ def analyze_generated():
             ctx.analyzePatterns()
             result_list.append(ctx)
         id += iterationCount
-    with open('stat generated.csv', 'w', newline='') as csvfile:
+    save_path = 'stat generated.csv'
+    saveResults(result_list, save_path)
+
+
+def saveResults(result_list, save_path):
+    with open(save_path, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile, delimiter=',')
         for result in result_list:
             writer.writerow(list(result))
 
 
-analyze_generated()
+analyze_codes("/home/shabivps/source/repo/fall22-researched-repos")
